@@ -23,8 +23,8 @@ export const LoginPage = () => {
   const loginWithGoogle = useAuthStore((state) => state.loginWithGoogle);
 
   const [visibility, setVisibility] = useState<Record<string, boolean>>({});
-  const [usuario, setUsuario] = useState("emilys");
-  const [contrasena, setContrasena] = useState("emilyspass");
+  const [usuario, setUsuario] = useState("LuwyDyro");
+  const [contrasena, setContrasena] = useState("12345");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 

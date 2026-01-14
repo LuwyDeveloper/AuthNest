@@ -8,7 +8,7 @@ const firebaseConfig = {
   projectId: "designsystemluwy",
   storageBucket: "designsystemluwy.firebasestorage.app",
   messagingSenderId: "796935335686",
-  appId: "1:796935335686:web:7856bd0a7c43445dc13887"
+  appId: "1:796935335686:web:a26ad32437a44b58c13887"
 };
 
 const app = initializeApp(firebaseConfig);
