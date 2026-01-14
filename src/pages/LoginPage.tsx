@@ -191,6 +191,14 @@ export const LoginPage = () => {
           >
             {loading ? "Ingresando..." : "Iniciar Sesión"}
           </button>
+          <div className="pt-2 text-zinc-400 italic flex flex-col">
+            <div>
+            <strong>Usuario:</strong> <span className="text-zinc font-normal">LuwyDyro</span>
+            </div>
+            <div>
+            <strong>Contraseña:</strong> <span className="text-zinc font-normal">12345</span>
+            </div>
+          </div>
         </form>
       </div>
     </div>
