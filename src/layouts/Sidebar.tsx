@@ -1,22 +1,12 @@
 import { useState, useEffect } from "react";
 import type React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import {
-  ChevronDown,
-  Home,
-  PanelLeftOpen,
-  // TableProperties,
-  Power,
-  ShieldCheck,
-  // Pyramid,
-  // ChartPie,
-  // Users,
-  Menu,
-} from "lucide-react";
+import { ChevronDown, Home, PanelLeftOpen, Power, Menu } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
 import useSidebarStatus from "../hooks/useSidebarStatus";
 import { perfil, logo_luwydyro_dark } from "../assets/images";
+import { useSessionTimer } from "../hooks/useTimer";
 
 type MenuChild = {
   label: string;
@@ -38,8 +28,29 @@ type MenuSection = {
 
 const homeItem: MenuItem = { label: "Home", icon: Home, href: "/" };
 
+const SessionCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
+  const timeLeft = useSessionTimer();
+
+  if (timeLeft <= 0) return null;
+
+  const minutes = Math.floor(timeLeft / 60000);
+  const seconds = Math.floor((timeLeft % 60000) / 1000);
+
+  return (
+    <div className="px-3 pb-4">
+      <div className="flex flex-col items-center justify-center py-3 border rounded-lg border-blue-800 overflow-hidden bg-slate-900 false transition-all duration-300 ease-in-out">
+        {sidebarStatus && (
+          <p className="text-center">La Sesión expirará en:</p>
+        )}
+        <strong className="">
+          {minutes}:{seconds.toString().padStart(2, "0")}
+        </strong>
+      </div>
+    </div>
+  );
+};
+
 export const Sidebar = () => {
-  // const [isExpanded, setIsExpanded] = useState(true);
   const { sidebarStatus, setSidebarStatus } = useSidebarStatus();
   const [openItemLabel, setOpenItemLabel] = useState<string | null>("null");
   const [opened, setOpened] = useState<boolean>(false);
@@ -55,40 +66,9 @@ export const Sidebar = () => {
 
   const menuSections: MenuSection[] = [
     {
-      title: "Auth",
-      items: [
-        {
-          label: "Authentications",
-          href: "/authentication",
-          icon: ShieldCheck,
-        },
-        // {
-        //   label: "Roles",
-        //   href: "/roles",
-        //   icon: Pyramid,
-        // },
-        // {
-        //   label: "Users",
-        //   href: "/users",
-        //   icon: Users,
-        // },
-      ],
+      title: "",
+      items: [],
     },
-    // {
-    //   title: "Apps",
-    //   items: [
-    //     {
-    //       label: "Charts",
-    //       href: "/charts",
-    //       icon: ChartPie,
-    //     },
-    //     {
-    //       label: "Tables",
-    //       href: "/tables",
-    //       icon: TableProperties,
-    //     },
-    //   ],
-    // },
   ];
 
   useEffect(() => {
@@ -222,7 +202,7 @@ export const Sidebar = () => {
           </div>
         </div>
       </div>
-      {/* <div className="flex items-center py-3 px-3 text-xs before:flex-1 before:border-t before:border-blue-800 after:flex-1 after:border-t after:border-blue-800"></div> */}
+
       <nav className="flex-1 pt-0 px-4 pb-20 overflow-auto no-scrollbar">
         <NavItem
           item={homeItem}
@@ -261,6 +241,7 @@ export const Sidebar = () => {
           </div>
         ))}
       </nav>
+      <SessionCountdown sidebarStatus={sidebarStatus}></SessionCountdown>
     </aside>
   );
 };

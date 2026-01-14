@@ -35,7 +35,7 @@ const loginWithApi = async (username: string, password: string) => {
     throw err;
   }
 };
-const SESSION_DURATION = 15 * 60 * 1000;
+const SESSION_DURATION = 10 * 60 * 1000;
 
 export const useAuthStore = create<AuthState>()(
   persist(

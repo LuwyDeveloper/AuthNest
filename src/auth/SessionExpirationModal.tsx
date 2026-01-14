@@ -12,7 +12,7 @@ export const SessionExpirationModal = () => {
   if (!isOpen) return null;
   const continueSession = () => {
     setExpiresAt({
-      expiresAt: Date.now() + 15 * 60 * 1000,
+      expiresAt: Date.now() + 10 * 60 * 1000,
     });
     close();
   };

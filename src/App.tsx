@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import { LoginPage } from "./pages/LoginPage";
 import { HomePage } from "./pages/HomePage";
-import { AuthenticationPage } from "./pages/AuthenticationPage";
+// import { AuthenticationPage } from "./pages/AuthenticationPage";
 import { DashboardLayout } from "./layouts/DashboardLayout";
 
 import { ProtectedRoute } from "./auth/ProtectedRoute";
@@ -35,7 +35,7 @@ function App() {
           }
         >
           <Route index element={<HomePage />} />
-          <Route path="authentication" element={<AuthenticationPage />} />
+          {/* <Route path="authentication" element={<AuthenticationPage />} /> */}
         </Route>
       </Route>
     </Routes>
