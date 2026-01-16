@@ -98,6 +98,7 @@ const Chart: FC<IChartProps> = (props) => {
 			},
 		},
 		yaxis: {
+			
 			labels: {
 				style: {
 					colors: '#71717b',

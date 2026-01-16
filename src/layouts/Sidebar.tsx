@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import type React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronDown, Home, PanelLeftOpen, Power, Menu } from "lucide-react";
+import { ChevronDown, PanelLeftOpen, Power, Menu, ChartArea , ChartNetwork ,  } from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
 import useSidebarStatus from "../hooks/useSidebarStatus";
 import { perfil, logo_luwydyro_dark } from "../assets/images";
 import { useSessionTimer } from "../hooks/useTimer";
+import { useIdleTimer } from "../hooks/useTimerIdle";
 
 type MenuChild = {
   label: string;
@@ -26,7 +27,8 @@ type MenuSection = {
   items: MenuItem[];
 };
 
-const homeItem: MenuItem = { label: "Home", icon: Home, href: "/" };
+const homeItem: MenuItem = { label: "Dashboard - Mocks", icon: ChartArea, href: "/" };
+const homeItem2: MenuItem = { label: "Dashboard - API", icon: ChartNetwork, href: "/apidashboard" };
 
 const SessionCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
   const timeLeft = useSessionTimer();
@@ -35,16 +37,59 @@ const SessionCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
 
   const minutes = Math.floor(timeLeft / 60000);
   const seconds = Math.floor((timeLeft % 60000) / 1000);
+  const isEnding = timeLeft <= 120_000;
 
   return (
     <div className="px-3 pb-4">
-      <div className="flex flex-col items-center justify-center py-3 border rounded-lg border-blue-800 overflow-hidden bg-slate-900 false transition-all duration-300 ease-in-out">
+      <div
+        className={`flex flex-col items-center justify-center py-3 border rounded-lg transition-all  ${
+          isEnding
+            ? "border-red-600 bg-red-950"
+            : "border-blue-800 bg-slate-900"
+        }`}
+      >
         {sidebarStatus && (
-          <p className="text-center">La Sesión expirará en:</p>
+          <p className="text-center">
+            {isEnding
+              ? "La sesión está por expirar en:"
+              : "La Sesión expirará en:"}
+          </p>
         )}
-        <strong className="">
+        <strong>
           {minutes}:{seconds.toString().padStart(2, "0")}
         </strong>
+      </div>
+    </div>
+  );
+};
+
+const IdleCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
+  const timeLeft = useIdleTimer();
+
+  if (timeLeft <= 0) return null;
+
+  const minutes = Math.floor(timeLeft / 60000);
+  const seconds = Math.floor((timeLeft % 60000) / 1000);
+  const isEnding = timeLeft <= 10_000;
+
+  return (
+    <div className="px-3 pb-4">
+      <div
+        className={`flex flex-col items-center justify-center py-3 border rounded-lg transition-all ${
+          isEnding
+            ? "border-red-700 bg-red-950"
+            : "border-yellow-500 bg-yellow-950"
+        }`}
+      >
+        {sidebarStatus && <p className="text-center">Inactividad detectada:</p>}
+        <strong>
+          {minutes}:{seconds.toString().padStart(2, "0")}
+        </strong>
+        {sidebarStatus && !isEnding && (
+          <span className="text-xs opacity-80">
+            Interactúa para continuar
+          </span>
+        )}
       </div>
     </div>
   );
@@ -210,6 +255,12 @@ export const Sidebar = () => {
           isOpen={false}
           onClick={() => {}}
         ></NavItem>
+                <NavItem
+          item={homeItem2}
+          isExpanded={sidebarStatus}
+          isOpen={false}
+          onClick={() => {}}
+        ></NavItem>
 
         {menuSections.map((section) => (
           <div key={section.title}>
@@ -241,6 +292,7 @@ export const Sidebar = () => {
           </div>
         ))}
       </nav>
+      <IdleCountdown sidebarStatus={sidebarStatus}></IdleCountdown>
       <SessionCountdown sidebarStatus={sidebarStatus}></SessionCountdown>
     </aside>
   );

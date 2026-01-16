@@ -1,39 +1,61 @@
 import { create } from "zustand";
 import { useAuthStore } from "../auth/auth.store";
 
-const IDLE_TIME = 60 * 1000;
-
 interface IdleState {
-  timer: number | null;
+  idleTimer: number | null;
+  graceTimer: number | null;
+  expiresAt: number | null;
   start: () => void;
   reset: () => void;
   stop: () => void;
 }
+const IDLE_TIME = 60 * 1000;
+const GRACE_TIME = 3000;
 
 export const useIdleStore = create<IdleState>((set, get) => ({
-  timer: null,
+  idleTimer: null,
+  graceTimer: null,
+  expiresAt: null,
 
   start: () => {
     get().reset();
   },
 
   reset: () => {
-    const { timer } = get();
+    const { idleTimer, graceTimer } = get();
     const logout = useAuthStore.getState().logout;
 
-    if (timer) window.clearTimeout(timer);
+    if (idleTimer) window.clearTimeout(idleTimer);
+    if (graceTimer) window.clearTimeout(graceTimer);
 
-    const newTimer = window.setTimeout(() => {
-      console.warn("Logout por inactividad");
-      logout();
-    }, IDLE_TIME);
+    set({ expiresAt: null });
 
-    set({ timer: newTimer });
+    const newGraceTimer = window.setTimeout(() => {
+      const expiresAt = Date.now() + IDLE_TIME;
+
+      const newIdleTimer = window.setTimeout(() => {
+        console.warn("Logout por inactividad");
+        logout();
+      }, IDLE_TIME);
+
+      set({
+        idleTimer: newIdleTimer,
+        expiresAt,
+      });
+    }, GRACE_TIME);
+
+    set({ graceTimer: newGraceTimer });
   },
 
   stop: () => {
-    const { timer } = get();
-    if (timer) window.clearTimeout(timer);
-    set({ timer: null });
+     const { idleTimer, graceTimer } = get();
+    if (idleTimer) window.clearTimeout(idleTimer);
+    if (graceTimer) window.clearTimeout(graceTimer);
+
+    set({
+      idleTimer: null,
+      graceTimer: null,
+      expiresAt: null,
+    });
   },
 }));

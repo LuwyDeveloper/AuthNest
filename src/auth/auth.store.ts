@@ -11,17 +11,20 @@ interface AuthState {
   loginWithGoogle: () => Promise<void>;
   logout: () => void;
 
-    isExpired: () => boolean;
+  isExpired: () => boolean;
   checkSession: () => void;
 }
 
 const loginWithApi = async (username: string, password: string) => {
   try {
-      const response = await fetch("https://backend-authnest-luwy.up.railway.app/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    const response = await fetch(
+      "https://backend-authnest-luwy.up.railway.app/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      }
+    );
 
     const data = await response.json();
 
@@ -47,13 +50,13 @@ export const useAuthStore = create<AuthState>()(
 
       login: async (username, password) => {
         const { access_token } = await loginWithApi(username, password);
-        
+
         set({
           user: username,
           token: access_token,
           expiresAt: Date.now() + SESSION_DURATION,
         });
-        console.log("Duracion Sesión", SESSION_DURATION)
+        console.log("Duracion Sesión", SESSION_DURATION);
       },
 
       loginWithGoogle: async () => {
@@ -65,14 +68,14 @@ export const useAuthStore = create<AuthState>()(
           token: user.uid,
           expiresAt: Date.now() + SESSION_DURATION,
         });
-        console.log("Duracion de la Sesión", SESSION_DURATION)
+        console.log("Duracion de la Sesión", SESSION_DURATION);
       },
 
       logout: () => {
         set({ user: null, token: null, expiresAt: null });
         useAuthStore.persist.clearStorage();
       },
-       isExpired: () => {
+      isExpired: () => {
         const { expiresAt } = get();
         return !!expiresAt && Date.now() > expiresAt;
       },
