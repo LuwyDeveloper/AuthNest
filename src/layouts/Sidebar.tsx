@@ -159,8 +159,8 @@ export const Sidebar = () => {
     <aside
       className={`h-screen bg-slate-900 max-md:z-2000 text-blue-50 border border-blue-900 flex flex-col top-0 transition-all duration-300 ${
         sidebarStatus
-          ? "md:w-64 max-md:left-0 sticky max-md:fixed"
-          : "md:w-19 max-md:-left-55 max-md:fixed"
+          ? "w-64 max-md:left-0 sticky max-md:fixed"
+          : "w-19 max-md:-left-55 max-md:fixed"
       }  z-1001`}
     >
       <div className="flex items-center">
