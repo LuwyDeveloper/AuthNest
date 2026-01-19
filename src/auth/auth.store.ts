@@ -2,11 +2,19 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { loginWithGoogle } from "./firebase";
 
+interface AuthUser {
+  name: string;
+  photoURL: string | null;
+  uid: string;
+  email?: string | null;
+}
+
 interface AuthState {
-  user: string | null;
+  user: AuthUser | null;
   token: string | null;
   expiresAt: number | null;
   _hasHydrated: boolean;
+
   login: (username: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => void;
@@ -23,7 +31,7 @@ const loginWithApi = async (username: string, password: string) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -49,26 +57,39 @@ export const useAuthStore = create<AuthState>()(
       _hasHydrated: false,
 
       login: async (username, password) => {
-        const { access_token } = await loginWithApi(username, password);
+        const data = await loginWithApi(username, password);
+
+        const user: AuthUser = {
+          name: data.user.username,
+          uid: String(data.user.userId),
+          photoURL: null,
+          email: null,
+        };
 
         set({
-          user: username,
-          token: access_token,
+          user,
+          token: data.access_token,
           expiresAt: Date.now() + SESSION_DURATION,
         });
-        console.log("Duracion Sesión", SESSION_DURATION);
       },
 
       loginWithGoogle: async () => {
-        const user = await loginWithGoogle();
-        if (!user) throw new Error("Google login failed");
+        const firebaseUser = await loginWithGoogle();
+        if (!firebaseUser) throw new Error("Google login failed");
+
+        const user: AuthUser = {
+          name:
+            firebaseUser.displayName || firebaseUser.email || "Usuario Google",
+          photoURL: firebaseUser.photoURL || null,
+          uid: firebaseUser.uid,
+          email: firebaseUser.email || null,
+        };
 
         set({
-          user: user.displayName || user.email || "Usuario Google",
-          token: user.uid,
+          user,
+          token: firebaseUser.uid,
           expiresAt: Date.now() + SESSION_DURATION,
         });
-        console.log("Duracion de la Sesión", SESSION_DURATION);
       },
 
       logout: () => {
@@ -94,6 +115,6 @@ export const useAuthStore = create<AuthState>()(
         // console.warn("onRehydrateStorage called", state);
         if (state) state._hasHydrated = true;
       },
-    }
-  )
+    },
+  ),
 );

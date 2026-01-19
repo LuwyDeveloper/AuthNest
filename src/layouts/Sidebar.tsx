@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import type React from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ChevronDown, PanelLeftOpen, Power, Menu, ChartArea , ChartNetwork ,  } from "lucide-react";
+import {
+  ChevronDown,
+  PanelLeftOpen,
+  Power,
+  Menu,
+  ChartArea,
+  ChartNetwork,
+} from "lucide-react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import { useAuthStore } from "../auth/auth.store";
 import useSidebarStatus from "../hooks/useSidebarStatus";
-import { perfil, logo_luwydyro_dark } from "../assets/images";
+import {  logo_luwydyro_dark, defaultAvatar } from "../assets/images";
 import { useSessionTimer } from "../hooks/useTimer";
 import { useIdleTimer } from "../hooks/useTimerIdle";
 
@@ -27,8 +34,16 @@ type MenuSection = {
   items: MenuItem[];
 };
 
-const homeItem: MenuItem = { label: "Dashboard - Mocks", icon: ChartArea, href: "/" };
-const homeItem2: MenuItem = { label: "Dashboard - API", icon: ChartNetwork, href: "/apidashboard" };
+const homeItem: MenuItem = {
+  label: "Dashboard - Mocks",
+  icon: ChartArea,
+  href: "/",
+};
+const homeItem2: MenuItem = {
+  label: "Dashboard - API",
+  icon: ChartNetwork,
+  href: "/apidashboard",
+};
 
 const SessionCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
   const timeLeft = useSessionTimer();
@@ -86,9 +101,7 @@ const IdleCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
           {minutes}:{seconds.toString().padStart(2, "0")}
         </strong>
         {sidebarStatus && !isEnding && (
-          <span className="text-xs opacity-80">
-            Interactúa para continuar
-          </span>
+          <span className="text-xs opacity-80">Interactúa para continuar</span>
         )}
       </div>
     </div>
@@ -96,6 +109,7 @@ const IdleCountdown = ({ sidebarStatus }: { sidebarStatus: boolean }) => {
 };
 
 export const Sidebar = () => {
+  const { user } = useAuthStore();
   const { sidebarStatus, setSidebarStatus } = useSidebarStatus();
   const [openItemLabel, setOpenItemLabel] = useState<string | null>("null");
   const [opened, setOpened] = useState<boolean>(false);
@@ -123,7 +137,7 @@ export const Sidebar = () => {
       for (const item of section.items) {
         if (item.children) {
           const isChildActive = item.children.some(
-            (child) => child.href === location.pathname
+            (child) => child.href === location.pathname,
           );
           if (isChildActive) {
             parentLabelToOpen = item.label;
@@ -187,19 +201,24 @@ export const Sidebar = () => {
                 className="flex cursor-pointer gap-3 py-2 px-3 text-blue-3000 hover:text-blue-100 transition-all duration-300 ease-in-out"
                 onClick={() => setOpened((prevState) => !prevState)}
               >
-                <img
-                  src={perfil}
-                  alt="Avatar"
-                  className="bg-secondary-500/25 h-12 w-12 object-cover rounded-xl"
-                />
-                <div className="flex basis-full flex-wrap items-center truncate">
-                  <div className="flex basis-full items-center gap-2 truncate text-sm ">
-                    <span className="truncate ">Luwy Dyro</span>
-                  </div>
-                  <div className="basis-full truncate text-[0.688rem] first-letter:uppercase">
-                    Admin
-                  </div>
-                </div>
+                {user && (
+                  <>
+                    <img
+                      src={user.photoURL || defaultAvatar}
+                      alt={user.name}
+                      className="bg-secondary-500/25 h-10 w-10 object-cover rounded-3xl my-1"
+                    />
+                    <div className="flex basis-full flex-wrap items-center truncate">
+                      <div className="flex basis-full items-center gap-2 truncate text-sm ">
+                        <span className="truncate">{user.name}</span>
+                      </div>
+                      <div className="basis-full truncate text-[0.688rem]">
+                        {user.email || "Admin"}
+                      </div>
+                    </div>
+                  </>
+                )}
+                
               </div>
               <AnimatePresence>
                 {opened && (
@@ -255,7 +274,7 @@ export const Sidebar = () => {
           isOpen={false}
           onClick={() => {}}
         ></NavItem>
-                <NavItem
+        <NavItem
           item={homeItem2}
           isExpanded={sidebarStatus}
           isOpen={false}
@@ -273,8 +292,8 @@ export const Sidebar = () => {
               {sidebarStatus
                 ? section.title
                 : section.title.length > 4
-                ? section.title.substring(0, 3) + "..."
-                : section.title}
+                  ? section.title.substring(0, 3) + "..."
+                  : section.title}
             </b>
 
             {section.items.map((item) => (
