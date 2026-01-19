@@ -62,7 +62,7 @@ export const useAuthStore = create<AuthState>()(
         const user: AuthUser = {
           name: data.user.username,
           uid: String(data.user.userId),
-          photoURL: null,
+          photoURL: data.user.photoURL || "/perfil.png",
           email: null,
         };
 
